@@ -1,0 +1,39 @@
+name: Close Rate Summary – Daily Sync
+
+on:
+  schedule:
+    # Runs every day at 8:00 AM UTC.
+    # Adjust the cron expression if you need a different timezone:
+    #   8 AM US/Central (CST, UTC-6) → "0 14 * * *"
+    #   8 AM US/Eastern (EST, UTC-5) → "0 13 * * *"
+    - cron: "0 8 * * *"
+
+  # Allow manual runs from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Sync Airtable Close Rate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run close rate sync
+        env:
+          AIRTABLE_API_KEY:  ${{ secrets.AIRTABLE_API_KEY }}
+          AIRTABLE_BASE_ID:  ${{ secrets.AIRTABLE_BASE_ID }}
+          CALLS_TABLE_ID:    ${{ secrets.CALLS_TABLE_ID }}
+          SUMMARY_TABLE_ID:  ${{ secrets.SUMMARY_TABLE_ID }}
+        run: python airtable_close_rate.py
