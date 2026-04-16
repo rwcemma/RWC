@@ -78,9 +78,9 @@ def batch_create(table: str, records: list[dict]) -> None:
     for i in range(0, len(records), BATCH_SIZE):
         chunk = records[i : i + BATCH_SIZE]
         resp = requests.post(url, headers=HEADERS, json={"records": chunk}, timeout=30)
-    if not resp.ok:
-        print("ERROR DETAIL:", resp.text)
-    resp.raise_for_status()
+        if not resp.ok:
+            print("ERROR DETAIL:", resp.text)
+        resp.raise_for_status()
         log.info("Created %d records (batch %d)", len(chunk), i // BATCH_SIZE + 1)
         time.sleep(0.2)
 
